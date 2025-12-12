@@ -137,11 +137,11 @@ class TestAirflowClientAuthentication:
             from src.envs import AIRFLOW_API_VERSION, AIRFLOW_HOST, AIRFLOW_JWT_TOKEN
 
             # Verify environment variables are parsed correctly
-            assert AIRFLOW_HOST == "https://airflow.example.com:8080"
+            assert AIRFLOW_HOST == "https://airflow.example.com:8080/custom"
             assert AIRFLOW_JWT_TOKEN == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
             assert AIRFLOW_API_VERSION == "v2"
 
             # Verify configuration uses parsed values
-            assert configuration.host == "https://airflow.example.com:8080/api/v2"
+            assert configuration.host == "https://airflow.example.com:8080/custom/api/v2"
             assert configuration.api_key == {"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."}
             assert configuration.api_key_prefix == {"Authorization": ""}
