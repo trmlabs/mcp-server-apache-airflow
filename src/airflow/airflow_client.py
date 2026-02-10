@@ -28,13 +28,18 @@ if AIRFLOW_USE_GCP_AUTH:
         credentials.refresh(Request())
 
     # Set as Bearer token
-    configuration.api_key = {"Authorization": f"Bearer {credentials.token}"}
-    configuration.api_key_prefix = {"Authorization": ""}
+    configuration.api_key = {"Authorization": credentials.token}
+    configuration.api_key_prefix = {"Authorization": "Bearer"}
 elif AIRFLOW_JWT_TOKEN:
-    configuration.api_key = {"Authorization": f"Bearer {AIRFLOW_JWT_TOKEN}"}
-    configuration.api_key_prefix = {"Authorization": ""}
+    configuration.api_key = {"Authorization": AIRFLOW_JWT_TOKEN}
+    configuration.api_key_prefix = {"Authorization": "Bearer"}
 elif AIRFLOW_USERNAME and AIRFLOW_PASSWORD:
     configuration.username = AIRFLOW_USERNAME
     configuration.password = AIRFLOW_PASSWORD
 
 api_client = ApiClient(configuration)
+
+# Bearer auth requires manual header setup because auth_settings() in apache-airflow-client 2.x
+# only supports Basic authentication.
+if AIRFLOW_USE_GCP_AUTH or AIRFLOW_JWT_TOKEN:
+    api_client.default_headers["Authorization"] = configuration.get_api_key_with_prefix("Authorization")
