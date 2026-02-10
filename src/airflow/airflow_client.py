@@ -6,6 +6,7 @@ from src.envs import (
     AIRFLOW_JWT_TOKEN,
     AIRFLOW_PASSWORD,
     AIRFLOW_USERNAME,
+    AIRFLOW_USE_GCP_AUTH,
 )
 
 # Create a configuration and API client
@@ -13,8 +14,23 @@ configuration = Configuration(
     host=f"{AIRFLOW_HOST}/api/{AIRFLOW_API_VERSION}",
 )
 
-# Set up authentication - prefer JWT token if available, fallback to basic auth
-if AIRFLOW_JWT_TOKEN:
+# Set up authentication - priority: GCP > JWT > Basic
+if AIRFLOW_USE_GCP_AUTH:
+    # Use Google Cloud authentication (for Composer 2)
+    import google.auth
+    from google.auth.transport.requests import Request
+
+    AUTH_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
+    credentials, _ = google.auth.default(scopes=[AUTH_SCOPE])
+
+    # Refresh token if needed
+    if not credentials.valid:
+        credentials.refresh(Request())
+
+    # Set as Bearer token
+    configuration.api_key = {"Authorization": f"Bearer {credentials.token}"}
+    configuration.api_key_prefix = {"Authorization": ""}
+elif AIRFLOW_JWT_TOKEN:
     configuration.api_key = {"Authorization": f"Bearer {AIRFLOW_JWT_TOKEN}"}
     configuration.api_key_prefix = {"Authorization": ""}
 elif AIRFLOW_USERNAME and AIRFLOW_PASSWORD:

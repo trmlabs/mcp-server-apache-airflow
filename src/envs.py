@@ -10,5 +10,8 @@ AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD")
 AIRFLOW_JWT_TOKEN = os.getenv("AIRFLOW_JWT_TOKEN")
 AIRFLOW_API_VERSION = os.getenv("AIRFLOW_API_VERSION", "v1")
 
+# Google Cloud authentication (for Composer 2)
+AIRFLOW_USE_GCP_AUTH = os.getenv("AIRFLOW_USE_GCP_AUTH", "false").lower() in ("true", "1", "yes", "on")
+
 # Environment variable for read-only mode
 READ_ONLY = os.getenv("READ_ONLY", "false").lower() in ("true", "1", "yes", "on")
