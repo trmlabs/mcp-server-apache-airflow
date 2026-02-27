@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-hardened-latest-m
     steps:
       - uses: actions/checkout@v4
       
